@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Email Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Spam Email Detector</h1>
+        <form method="POST">
+            <label for="subject">Subject:</label><br>
+            <input type="text" id="subject" name="subject" required><br><br>
+            <label for="body">Email Body:</label><br>
+            <textarea id="body" name="body" rows="6" cols="40" required></textarea><br><br>
+            <button type="submit">Check Email</button>
+        </form>
+        
+        {% if result %}
+        <div class="result {{ 'spam' if 'Spam Detected' in result else 'not-spam' if 'NOT spam' in result else '' }}">
+            <h2>{{ result }}</h2>
+            {% if spam_score is not none %}
+                <p>Spam Score: <strong>{{ spam_score }}</strong></p>
+            {% endif %}
+            
+            {% if indicators %}
+                <div class="indicators">
+                    <h3>Indicators Found:</h3>
+                    <ul>
+                        {% for indicator in indicators %}
+                            <li>{{ indicator }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
