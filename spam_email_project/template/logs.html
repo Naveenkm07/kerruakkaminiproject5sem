@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Email Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Spam Email Logs</h1>
+        <p><a href="{{ url_for('index') }}">&#8592; Back to Spam Detector</a></p>
+
+        <div class="logs-filters">
+            <label for="searchInput">Search:</label>
+            <input type="text" id="searchInput" placeholder="Search subject or body">
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter">
+                <option value="all">All</option>
+                <option value="spam">Spam only</option>
+                <option value="ham">Not spam only</option>
+            </select>
+        </div>
+
+        {% if logs %}
+        <table class="logs-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Created At</th>
+                    <th>Subject</th>
+                    <th>Body</th>
+                    <th>Spam?</th>
+                    <th>Score (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="log-row {% if log.is_spam %}spam-row{% else %}ham-row{% endif %}" data-text="{{ (log.subject ~ ' ' ~ log.body)|lower }}">
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.created_at }}</td>
+                    <td>{{ log.subject }}</td>
+                    <td>{{ log.body }}</td>
+                    <td>{{ 'Yes' if log.is_spam else 'No' }}</td>
+                    <td>{{ '%.2f'|format(log.spam_score) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No logs found yet. Submit some emails to see the history here.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        (function() {
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const rows = Array.from(document.querySelectorAll('.log-row'));
+
+            function applyFilters() {
+                const search = (searchInput.value || '').toLowerCase();
+                const status = statusFilter.value;
+
+                rows.forEach(function(row) {
+                    const isSpam = row.classList.contains('spam-row') ? 'spam' : 'ham';
+                    const text = (row.dataset.text || '').toLowerCase();
+
+                    let visible = true;
+                    if (status !== 'all' && isSpam !== status) {
+                        visible = false;
+                    }
+                    if (search && !text.includes(search)) {
+                        visible = false;
+                    }
+                    row.style.display = visible ? '' : 'none';
+                });
+            }
+
+            if (searchInput && statusFilter && rows.length) {
+                searchInput.addEventListener('input', applyFilters);
+                statusFilter.addEventListener('change', applyFilters);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -9,6 +9,7 @@
 <body>
     <div class="container">
         <h1>Spam Email Detector</h1>
+        <p><a href="{{ url_for('view_logs') }}" class="logs-link">View classification history</a></p>
         <form method="POST">
             <label for="subject">Subject:</label><br>
             <input type="text" id="subject" name="subject" required><br><br>
